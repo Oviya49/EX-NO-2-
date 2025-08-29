@@ -1,12 +1,7 @@
 ## EX. NO:2 IMPLEMENTATION OF PLAYFAIR CIPHER
-
- 
-
+### Name           : Oviya N
+### Register Number: 212223040140
 ## AIM:
- 
-
- 
-
 To write a C program to implement the Playfair Substitution technique.
 
 ## DESCRIPTION:
@@ -21,9 +16,7 @@ To encrypt a message, one would break the message into digrams (groups of 2 lett
 ## EXAMPLE:
 ![image](https://github.com/Hemamanigandan/EX-NO-2-/assets/149653568/e6858d4f-b122-42ba-acdb-db18ec2e9675)
 
- 
-
-## ALGORITHM:
+ ## ALGORITHM:
 
 STEP-1: Read the plain text from the user.
 STEP-2: Read the keyword from the user.
@@ -31,13 +24,110 @@ STEP-3: Arrange the keyword without duplicates in a 5*5 matrix in the row order 
 STEP-4: Group the plain text in pairs and match the corresponding corner letters by forming a rectangular grid.
 STEP-5: Display the obtained cipher text.
 
+## Program:
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define SIZE 100
 
+void toLowerCase(char text[], int len) {
+    for (int i = 0; i < len; i++)
+        if (text[i] >= 'A' && text[i] <= 'Z')
+            text[i] += 32;
+}
 
+int removeSpaces(char *text, int len) {
+    int count = 0;
+    for (int i = 0; i < len; i++)
+        if (text[i] != ' ')
+            text[count++] = text[i];
+    text[count] = '\0';
+    return count;
+}
 
-Program:
+void generateKeyTable(char key[], int ks, char keyT[5][5]) {
+    int dicty[26] = {0}, i = 0, j = 0;
+    for (int k = 0; k < ks; k++) {
+        if (key[k] == 'j') key[k] = 'i';
+        if (!dicty[key[k] - 'a']) {
+            keyT[i][j++] = key[k];
+            dicty[key[k] - 'a'] = 1;
+            if (j == 5) { i++; j = 0; }
+        }
+    }
+    for (int k = 0; k < 26; k++) {
+        if (k + 'a' == 'j') continue;
+        if (!dicty[k]) {
+            keyT[i][j++] = k + 'a';
+            dicty[k] = 1;
+            if (j == 5) { i++; j = 0; }
+        }
+    }
+}
 
+void search(char keyT[5][5], char a, char b, int arr[]) {
+    if (a == 'j') a = 'i';
+    if (b == 'j') b = 'i';
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5; j++) {
+            if (keyT[i][j] == a) { arr[0] = i; arr[1] = j; }
+            if (keyT[i][j] == b) { arr[2] = i; arr[3] = j; }
+        }
+}
 
+int mod5(int a) { return (a % 5 + 5) % 5; }
 
+int prepare(char str[], int len) {
+    if (len % 2 != 0) {
+        str[len++] = 'z';
+        str[len] = '\0';
+    }
+    return len;
+}
 
+void encrypt(char str[], char keyT[5][5], int len) {
+    int a[4];
+    for (int i = 0; i < len; i += 2) {
+        search(keyT, str[i], str[i+1], a);
+        if (a[0] == a[2]) {
+            str[i]   = keyT[a[0]][mod5(a[1] + 1)];
+            str[i+1] = keyT[a[0]][mod5(a[3] + 1)];
+        } else if (a[1] == a[3]) {
+            str[i]   = keyT[mod5(a[0] + 1)][a[1]];
+            str[i+1] = keyT[mod5(a[2] + 1)][a[1]];
+        } else {
+            str[i]   = keyT[a[0]][a[3]];
+            str[i+1] = keyT[a[2]][a[1]];
+        }
+    }
+}
 
-Output:
+void encryptByPlayfairCipher(char str[], char key[]) {
+    char keyT[5][5];
+    int ks = strlen(key);
+    ks = removeSpaces(key, ks);
+    toLowerCase(key, ks);
+    int len = strlen(str);
+    toLowerCase(str, len);
+    len = removeSpaces(str, len);
+    len = prepare(str, len);
+    generateKeyTable(key, ks, keyT);
+    encrypt(str, keyT, len);
+}
+
+int main() {
+    char str[SIZE] = "oviya", key[SIZE] = "narayanasamy";
+    printf("Key text: %s\n", key);
+    printf("Plain text: %s\n", str);
+    encryptByPlayfairCipher(str, key);
+    printf("Cipher text: %s\n", str);
+    return 0;
+}
+```
+
+## Output:
+<img width="1627" height="765" alt="Screenshot 2025-08-29 142710" src="https://github.com/user-attachments/assets/4fab57b0-8ede-42e6-ac90-8b60b30f7fcc" />
+
+## Result:
+Thus the program executed successfully.
